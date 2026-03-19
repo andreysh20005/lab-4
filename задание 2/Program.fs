@@ -1,4 +1,3 @@
-﻿//Сумма элементов дерева
 open System
 open System.Text
 
