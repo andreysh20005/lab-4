@@ -1,3 +1,4 @@
+
 open System
 open System.Text
 
@@ -34,12 +35,9 @@ let rec insert t x =
         if x < z then Node(z, insert L x, R)
         else Node(z, L, insert R x)
 
-let treeFold f st tree =   
-    let rec ob d k = 
-        match d with
-        | Node (t, l, r) -> ob r (f (ob l k) t)
-        | Nil -> k
-    ob tree st
+
+
+
 
 
 
@@ -47,7 +45,17 @@ let randFloat () =
     let r = Random()
     r.NextDouble() * 200.0 - 100.0
 
+let treeFold f st tree =   
+    let rec ob d k = 
+        match d with
+        | Node (t, l, r) -> ob r (f (ob l k) t)
+        | Nil -> k
+    ob tree st
 
+let rec mapTree f tree =
+    match tree with
+    | Nil -> Nil
+    | Node(x, left, right) -> Node(f x, mapTree f left, mapTree f right)
 
 [<EntryPoint>]
 let main _ =
@@ -62,8 +70,8 @@ let main _ =
     printTree startBinTree
 
 
-    let newBinTree = treeFold (fun acc x -> insert acc (int x)) Nil startBinTree
-    printfn "\nНовое дерево (целые части исходных чисел)\n:"
+    let newBinTree = mapTree int startBinTree
+    printfn "\nНовое дерево (целые части исходных чисел):\n"
     printTree newBinTree
 
     0
