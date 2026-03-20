@@ -1,3 +1,4 @@
+//Сумма элементов дерева
 open System
 open System.Text
 
@@ -37,13 +38,18 @@ let rec insert t x =
                 if x<z then Node(z,insert L x ,R)
                 else Node(z,L,insert R x)
 
-let treeFold f st tree =   
-        let rec ob d k = 
-            match d with
-            | Node (t,l,r) -> ob r (f (ob l k) t)
-            | Nil -> k
-        ob tree st
-
+let treeFold f st tree =
+    let rec ob d k =
+        match d with
+        | Node (t, l, r) as node ->  
+            
+            let leftResult = ob l k
+            
+            let afterNode = f leftResult node
+            
+            ob r afterNode
+        | Nil -> k
+    ob tree st
 
 let rec mapTree f tree =
     match tree with
@@ -62,9 +68,11 @@ let randStr () =
     
 let incrementLastChar (str:string) =
     if str.Length > 0 then
-        str.[0..str.Length-2] + (char (int str.[str.Length-1] + 1)).ToString()
+        str.[0..str.Length-2] +
+        (char (int str.[str.Length-1] + 1)).ToString()
     else
         ""
+
 
 let oneLeafNode tree =
     let rec loop acc = function
@@ -72,6 +80,7 @@ let oneLeafNode tree =
         | Node(x, L, R) as node ->
             let condition = 
                 match node with
+                //| Node(_, Node(_, Nil, Nil), Node(_, Nil, Nil)) -> false
                 | Node(_, Nil, Node(_, Nil, Nil)) -> true
                 | Node(_, Node(_, Nil, Nil), Nil) -> true
                 | _ -> false
@@ -79,6 +88,13 @@ let oneLeafNode tree =
             loop (loop newAcc L) R
     loop [] tree 
 
+
+let isOneLeaf node =
+     match node with
+        //| Node(_, Node(_, Nil, Nil), Node(_, Nil, Nil)) -> false
+        | Node(_, Nil, Node(_, Nil, Nil)) -> true
+        | Node(_, Node(_, Nil, Nil), Nil) -> true
+        | _ -> false
 
 
 [<EntryPoint>]
@@ -95,7 +111,14 @@ let main _ =
     let startBinTree = A |> List.fold insert Nil
     printfn "исходное дерево:\n\n"
     printTree startBinTree
-    printfn "вершины с одним листом: %A" (oneLeafNode startBinTree)
+    printfn "вершины с одним листом: %A" (
+        treeFold (
+            fun acc node -> 
+                if isOneLeaf node then
+                    match node with Node(x, _, _) -> x :: acc
+                else 
+                    acc
+        ) [] startBinTree)
 
 
     0
